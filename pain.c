@@ -42,13 +42,6 @@ static const int RESOURCE_IDS[3] = {
   RESOURCE_ID_IMAGE_ACTION_ICON_DOWN
 };
 
-
-// static const GRect NUMBER_POSITIONS[3] =  {
-  //{{/* x: */ 100, /* y: */ 12 }, {/* width: */ 28, /* height: */ 28}},
-    //{{/* x: */ 100, /* y: */ 60 }, {/* width: */ 28, /* height: */ 28}},
-  //{{/* x: */ 100, /* y: */ 107 }, {/* width: */ 28, /* height: */ 28}}
-// }; 
-
 static Window * window;
 static TextLayer *time_layer;
 static TextLayer *text_layer;
@@ -91,36 +84,6 @@ static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
         toggle_painlayer();
     }
   }
-/*
-  if (atoi(seconds) % 10 == 0) { // Send data every 10th second
-    if ((waiting_accel_data) && (msg_run == false)) {
-      Tuplet tup_data = TupletBytes(KEY_DATA, (uint8_t *)acc_data_array, num_samples*12);
-      //Tuplet tup_data = TupletBytes(KEY_DATA, (uint8_t *)acc_data, num_samples*6);
-      //Tuplet tup_time = TupletBytes(KEY_TIME, acc_time, sizeof(acc_time));
-
-      Tuplet tup_count = TupletInteger(KEY_COUNT, sent_count);
-      //Tuplet tup_time = TupletInteger(KEY_TIME, acc_time);
-      if (waiting_pain_data == true)
-        num_pain_send = num_pain;
-      else {
-        num_pain_send = EMPTY_VALUE;
-        pain_time = EMPTY_VALUE;
-      }
-      //Tuplet tup_pain_level = TupletInteger(KEY_PAIN, num_pain_send);
-      //Tuplet tup_pain_time = TupletInteger(KEY_PAIN_TIME, pain_time);
-      DictionaryIterator *iter;
-      app_message_outbox_begin(&iter);
-      dict_write_tuplet(iter, &tup_data);
-      dict_write_tuplet(iter, &tup_count);
-      //dict_write_tuplet(iter, &tup_time);
-      //dict_write_tuplet(iter, &tup_pain_level);
-      //dict_write_tuplet(iter, &tup_pain_time);
-      app_message_outbox_send();
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Message sent");
-      msg_run = true;
-      sent_count++;
-    }
-  } */
 }
 
 void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
