@@ -58,7 +58,8 @@ static const uint32_t inbound_size = 64;
 static const uint32_t outbound_size = 600;
 static void toggle_painlayer();
 
-// Called once per second
+//Called once per second
+//Show new clock value and show/hide pain gauge depending on pain data status
 static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
   static char time_text[] = "00:00:00"; 
 
@@ -91,6 +92,7 @@ void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, voi
   msg_run = false;
 }
 
+//Called when Android end receives data
 void out_received_handler(DictionaryIterator *received, void *context) {
   waiting_accel_data = false;
   if (num_pain_send != EMPTY_VALUE)
@@ -99,6 +101,7 @@ void out_received_handler(DictionaryIterator *received, void *context) {
   msg_run = false;
 }
 
+//Handle accelerometer data as it comes in
 static void accel_data_handler(AccelData *data, uint32_t num_samples) {
   AccelData *d = data;
   uint16_t cnt = 0;
@@ -123,6 +126,7 @@ static void accel_data_handler(AccelData *data, uint32_t num_samples) {
   }
 }
 
+//Create arrows onscreen
 static void init_arrows(Window *window) {
   for (int i = 0; i < 3; i++) {
     ArrowSelection *arrow_selection = &s_arrow_selection[i];
@@ -142,14 +146,7 @@ static void bitmap_init(Window *window, Layer *window_layer) {
   layer_add_child(window_layer, bitmap_layer_get_layer(down_arrow_layer));
 }
 
-static void deinit_arrow_selection(void) {
-  for (int i = 0; i < 3; i++) {
-    ArrowSelection *arrow_selection = &s_arrow_selection[i];
-    text_layer_destroy(arrow_selection->text_layer);
-    gbitmap_destroy(arrow_selection->bitmap);
-  }
-}
-
+//Show or hide the pain levels panel
 static void toggle_painlayer() {
   if (layer_get_hidden(text_layer_get_layer(painlevel_layer)) == false) {
     layer_set_hidden(bitmap_layer_get_layer(up_arrow_layer), true);
@@ -166,6 +163,8 @@ static void toggle_painlayer() {
     painlayer_hidden = false;
   }
 }
+
+//Handle up button click
 //Adjusts the pain level, keeping it from going above 10.
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (painlayer_hidden == false) {
@@ -177,6 +176,8 @@ static void up_single_click_handler(ClickRecognizerRef recognizer, void *context
   }
 }
 
+//Handle middle button click
+//Shows/hides pain layer
 static void select_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (painlayer_hidden == false) {
     waiting_pain_data = true;
@@ -187,6 +188,7 @@ static void select_single_click_handler(ClickRecognizerRef recognizer, void *con
   }
 }
 
+//Handle down button click
 //Adjusts the pain level, keeping it from going below 0.
 static void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (painlayer_hidden == false) { 
@@ -205,7 +207,7 @@ static void config_provider(Window *window) {
   window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler);
 }
 
-
+//Initialize all services
 static void on_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   init_arrows(window);
@@ -250,6 +252,15 @@ static void on_window_load(Window *window) {
   app_message_open(inbound_size, outbound_size);
 }
 
+static void deinit_arrow_selection(void) {
+  for (int i = 0; i < 3; i++) {
+    ArrowSelection *arrow_selection = &s_arrow_selection[i];
+    text_layer_destroy(arrow_selection->text_layer);
+    gbitmap_destroy(arrow_selection->bitmap);
+  }
+}
+
+//Deallocate memory when app is being exited
 void on_window_unload(Window *window) {
   accel_data_service_unsubscribe();
   free(acc_data);
